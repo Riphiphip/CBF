@@ -1,0 +1,29 @@
+/**
+ * Grammar for programs written in cbf.
+ * Note that this grammar does not take into account
+ * comments. Comments are simply regarded as anything
+ * that is not specified by the grammar.
+ * Whitespace between tokens is ignored unless 
+ * otherwise specified.
+**/
+
+lock_name:          [a-zA-Z0-9_]+
+
+operator:           '+'
+        |           '-'
+        |           '<'
+        |           '>'
+        |           '?'lock_name        << NO WHITESPACE!!!
+        |           '!'lock_name        << NO WHITESPACE!!!
+
+loop:               '['program_sequence']'
+
+program_element:    loop
+                    |operator
+
+program_sequence:   *empty*
+                    |program_element program_sequence
+
+program:            *empty*
+                    |program_sequence '\n' program
+                    |'\n'
