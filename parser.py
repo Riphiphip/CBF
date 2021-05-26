@@ -1,5 +1,6 @@
 import sys
 
+
 class ParseError(Exception):
     pass
 
@@ -20,7 +21,10 @@ def parse_line(line):
         c = line[i]
         match c:
             case '+' | '-' | '>' | '<':
-                instructions.append(c)
+                if i > 0 and instructions[-1][0] == c:
+                    instructions[-1] = (c, instructions[-1][1]+1)
+                else:
+                    instructions.append((c, 1))
             case '[':
                 if i+1 >= len(line):
                     raise ParseError(f'{i} Unmatched "["')
@@ -28,7 +32,7 @@ def parse_line(line):
                 close_index = -1
                 for search_i in range(i, len(line)):
                     match line[search_i]:
-                        case '[': 
+                        case '[':
                             depth += 1
                         case ']':
                             depth -= 1
@@ -45,7 +49,7 @@ def parse_line(line):
                 if len(line) <= i+1:
                     raise ParseError(f'{i} Missing lock name following {c}')
                 lockname = parse_lockname(line[i+1:])
-                if len(lockname)< 1:
+                if len(lockname) < 1:
                     raise ParseError(
                         f'{i} Missing/invalid lock name following {c}')
                 instructions.append((c, lockname))
@@ -72,12 +76,13 @@ def parse_file(file_path):
 
 if __name__ == '__main__':
     result = []
-    if len(sys.argv)>1:
+    if len(sys.argv) > 1:
         result = parse_file(sys.argv[1])
     else:
         while True:
             line = sys.stdin.readline().strip()
-            if line == '': break
+            if line == '':
+                break
             result.append(parse_line(line))
-    for i,thread in enumerate(result):
+    for i, thread in enumerate(result):
         print(f'Thread {i}: {thread}')
