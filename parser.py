@@ -4,7 +4,7 @@ class ParseError(Exception):
     pass
 
 
-def extract_lockname(string):
+def parse_lockname(string):
     lockname = ''
     i = 0
     while i < len(string) and string[i].lower() in 'abcdefghijklmnopqrstuvwxyz_0123456789':
@@ -44,7 +44,7 @@ def parse_line(line):
             case '?' | '!':
                 if len(line) <= i+1:
                     raise ParseError(f'{i} Missing lock name following {c}')
-                lockname = extract_lockname(line[i+1:])
+                lockname = parse_lockname(line[i+1:])
                 if len(lockname)< 1:
                     raise ParseError(
                         f'{i} Missing/invalid lock name following {c}')
@@ -66,7 +66,7 @@ def parse_file(file_path):
                 instructions = parse_line(line)
             except ParseError as e:
                 raise ParseError(f'{file_path}:{i}:{e}')
-            threads.append(parse_line(line))
+            threads.append(instructions)
     return threads
 
 
