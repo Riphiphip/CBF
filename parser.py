@@ -20,9 +20,24 @@ def parse_line(line):
     while i < len(line):
         c = line[i]
         match c:
-            case '+' | '-' | '>' | '<':
-                if i > 0 and instructions[-1][0] == c:
-                    instructions[-1] = (c, instructions[-1][1]+1)
+            case '+' | '-' :
+                if i > 0 and len(instructions) > 0 and instructions[-1][0] in '+-':
+                    if instructions[-1][0] == c:
+                        instructions[-1] = (c, instructions[-1][1]+1)
+                    else:
+                        instructions[-1] = (instructions[-1][0] ,instructions[-1][1]-1)
+                        if instructions[-1][1] == 0:
+                            instructions = instructions[:-1]
+                else:
+                    instructions.append((c, 1))
+            case '>' | '<':
+                if i > 0 and len(instructions) > 0 and instructions[-1][0] in '<>':
+                    if instructions[-1][0] == c:
+                        instructions[-1] = (c, instructions[-1][1]+1)
+                    else:
+                        instructions[-1] = (instructions[-1][0] ,instructions[-1][1]-1)
+                        if instructions[-1][1] == 0:
+                            instructions = instructions[:-1]
                 else:
                     instructions.append((c, 1))
             case '[':
@@ -72,8 +87,6 @@ def parse_file(file_path):
                 raise ParseError(f'{file_path}:{i}:{e}')
             threads.append(instructions)
     return threads
-
-#TODO: Combine consecutive sequences of + and - / < and > 
 
 
 if __name__ == '__main__':
