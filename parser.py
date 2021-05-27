@@ -73,6 +73,8 @@ def parse_file(file_path):
             threads.append(instructions)
     return threads
 
+#TODO: Combine consecutive sequences of + and - / < and > 
+
 
 if __name__ == '__main__':
     result = []
