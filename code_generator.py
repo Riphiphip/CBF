@@ -12,6 +12,8 @@ def loop_id_gen():
         yield i
         i = i+1
 
+def indent(string):
+    return '\t'.join(string.splitlines(True))
 
 class CodeGenError(Exception):
     pass
@@ -93,8 +95,8 @@ def generate_loop(body, id_generator):
     result += f'movq ({tape_ptr_reg}), {loop_cmp_reg}\n'
     result += f'cmp {loop_cmp_reg}, $0\n'
     result += f'je {loop_bottom_lbl(id)}\n'
-    result += '\t'.join(generate_statement_sequence(body, id_generator).splitlines(True))
-    result += f'\tjmp {loop_top_lbl(id)}\n'
+    result += indent(generate_statement_sequence(body, id_generator))
+    result += indent(f'jmp {loop_top_lbl(id)}\n')
     result += f'{loop_bottom_lbl(id)}:\n'
     return result
 
@@ -123,7 +125,7 @@ tape_end_label = '__cbf_tape_end'
 
 def generate_tape_area(size):
     result = f'{tape_label}:\n'
-    result += f'\t.skip {size}\n'
+    result += indent(f'.skip {size}\n')
     result += f'{tape_end_label}:'
     return result
 
