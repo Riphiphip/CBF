@@ -14,7 +14,7 @@ def parse_lockname(string):
     return lockname
 
 
-def parse_line(line):
+def parse_line(line, lock_set):
     instructions = []
     i = 0
     while i < len(line):
@@ -58,7 +58,7 @@ def parse_line(line):
                             pass
                 if close_index < 0:
                     raise ParseError(f'{i} Unmatched "["')
-                instructions.append(('[]', parse_line(line[i+1:close_index])))
+                instructions.append(('[]', parse_line(line[i+1:close_index], lock_set)))
                 i = close_index
             case '?' | '!':
                 if len(line) <= i+1:
@@ -67,6 +67,7 @@ def parse_line(line):
                 if len(lockname) < 1:
                     raise ParseError(
                         f'{i} Missing/invalid lock name following {c}')
+                lock_set.add(lockname)
                 instructions.append((c, lockname))
                 i += len(lockname)
             case _:
@@ -77,16 +78,17 @@ def parse_line(line):
 
 def parse_file(file_path):
     threads = []
+    lock_set = set()
     with open(file_path) as f:
         lines = f.readlines()
         for i, line in enumerate(lines):
             instructions = []
             try:
-                instructions = parse_line(line)
+                instructions = parse_line(line, lock_set)
             except ParseError as e:
                 raise ParseError(f'{file_path}:{i}:{e}')
             threads.append(instructions)
-    return threads
+    return threads, lock_set
 
 
 if __name__ == '__main__':
