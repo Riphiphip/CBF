@@ -239,7 +239,8 @@ def generate_main(thread_ids, locks):
         result += indent(f'call pthread_join@PLT\n')
         result += indent(f'pop %rsi\n')
         result += indent(f'pop %rsi\n')
-    result += indent('ret\n')
+    result += indent('movq $0, %rax\n')
+    result += indent('call exit\n')
     return result
 
 def generate_program(ir, locks, tape_size):
